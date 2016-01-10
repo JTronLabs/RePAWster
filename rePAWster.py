@@ -1,7 +1,6 @@
 import praw
 import random
 import time
-import traceback
 
 dog_subreddits = ["dogpictures",
     "DogsOnHardwoodFloors",
@@ -101,6 +100,8 @@ def find_and_submit_posts():
     all_approved_submissions = []
     try:
         for subreddit_name in dog_subreddits:
+            if(subreddit_name == "DogsWithEyebrows"):
+                raise Exception('test exception - suck it!')
             approved_submissions = check_subreddit_for_submissions(subreddit_name, r )
 
             all_approved_submissions = all_approved_submissions + approved_submissions
@@ -109,10 +110,10 @@ def find_and_submit_posts():
         submit_to_my_subreddit(r,all_approved_submissions)
     except Exception as e:
         print("Some exception has occurred ...trying again after a short rest")
-        print ""
-        print traceback.print_exc()
-        print ""
-        print ""
+        print("")
+        print(str(e))
+        print("")
+        print("")
         time.sleep(60 * 5)#5min
         find_and_submit_posts()
 
