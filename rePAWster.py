@@ -31,7 +31,7 @@ def check_subreddit_for_submissions(subreddit_name,reddit_obj):
 
     for submission in subreddit_submissions:
         karma = submission.ups - submission.downs
-        if(karma > median_karma and is_image_url(submission.url) and is_new_submission(submission)):
+        if(karma > median_karma and is_image_url(submission.url) ):
             approved_submissions.append(submission)
 
     return approved_submissions
@@ -39,16 +39,14 @@ def check_subreddit_for_submissions(subreddit_name,reddit_obj):
 def is_image_url(url):
     return True
 
-def is_new_submission(submission):
-    return True
-
 def submit_to_my_subreddit(reddit_obj,submissions):
     print("Submitting links to /r/top_dogs subreddit")
     reddit_obj.login("rePAWster","Hundr3d",disable_warning=True)
 
     for submission in submissions:
+        new_post = reddit_obj.submit(subreddit="top_dogs",resubmit=False,title=submission.title,url=submission.url)
+        new_post.add_comment("Original: "+submission.permalink)
         print("submitted!")
-        reddit_obj.submit(subreddit="top_dogs",title=submission.title+"["+submission.permalink+"]",url=submission.url)
 
 def subreddit_posts_to_list(reddit_obj,subreddit_name):
     subreddit = reddit_obj.get_subreddit(subreddit_name)
@@ -66,7 +64,7 @@ def submissions_karma_stats(submissions):
         karma_values.append(submission_karma)
 
     karma_values.sort()
-    
+
     #returns median, min, and max karma values
     return karma_values[int(len(karma_values)/2)], karma_values[0], karma_values[len(karma_values)-1]
 
