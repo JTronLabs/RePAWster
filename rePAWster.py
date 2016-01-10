@@ -1,6 +1,7 @@
 import praw
 import random
 import time
+from datetime import datetime, timedelta
 
 dog_subreddits = ["dogpictures",
     "DogsOnHardwoodFloors",
@@ -19,7 +20,6 @@ dog_subreddits = ["dogpictures",
 
 user_agent = "/r/top_dogs submission gathering (by /u/rePAWster)"
 num_submissions_to_grab_from_each_dog_subreddit = 25 #use a max of 25 please
-#num_submissions_to_post_to_my_subreddit_per_iteration= 6 #use a max of 25 please
 
 def check_subreddit_for_submissions(subreddit_name,reddit_obj):
     print("/r/"+subreddit_name+" is being checked for submissions...")
@@ -31,10 +31,15 @@ def check_subreddit_for_submissions(subreddit_name,reddit_obj):
 
     for submission in subreddit_submissions:
         karma = submission.ups - submission.downs
-        if(post_is_good_enough(median_karma,max_karma,min_karma,karma) and is_image_url(submission.url) ):
+        if(post_is_new_enough(submission.created) and post_is_good_enough(median_karma,max_karma,min_karma,karma) and is_image_url(submission.url) ):
             approved_submissions.append(submission)
 
     return approved_submissions
+
+def post_is_new_enough(creation_time):
+    submission_creation_datetime = datetime.fromtimestamp(creation_time)
+    cutoff = datetime.now() - timedelta(days=7)
+    return submission_creation_datetime > cutoff
 
 def post_is_good_enough(median_karma,max_karma,min_karma,post_karma):
     return post_karma > median_karma and post_karma > max_karma * 0.7
@@ -46,16 +51,12 @@ def submit_to_my_subreddit(reddit_obj,submissions):
     print("Submitting links to /r/top_dogs subreddit")
     reddit_obj.login("rePAWster","Hundr3d",disable_warning=True)
 
-    #end_iteration = min( num_submissions_to_post_to_my_subreddit_per_iteration, len(submissions)-1 )
-    #num_dog_pics_submitted = 0
-    #while(num_dog_pics_submitted < end_iteration and len(submissions)>0 ):
     while(len(submissions)>0 ):
         submission = submissions[0]
 
         try:
             #submit a cross posted dog picture link to top_dogs subreddit
             new_post = reddit_obj.submit(subreddit="top_dogs",resubmit=False,title=submission.title,url=submission.url)
-            num_dog_pics_submitted += 1
             print("Submitted dog picture!")
 
             #comment the original source on the submission
@@ -63,12 +64,10 @@ def submit_to_my_subreddit(reddit_obj,submissions):
                 new_post.add_comment("Original: "+submission.permalink)
                 print("Submitted comment on post!")
             except Exception as e:
-                print("Commenting error")
+                print(str(e))
 
-        except praw.errors.AlreadySubmitted as e:
-            print("Link already submitted")
         except Exception as e:
-            print("Submission Error")
+            print(str(e))
 
         del submissions[0]
 
@@ -107,11 +106,11 @@ def find_and_submit_posts():
         random.shuffle(all_approved_submissions)
         submit_to_my_subreddit(r,all_approved_submissions)
     except Exception as e:
-        print("Some exception has occurred ...trying again after a short rest")
+        print("Exception! ")
         print("")
         print(str(e))
         print("")
-        print("")
+        print("Will retry after short rest")
         time.sleep(60 * 5)#5min
         find_and_submit_posts()
 
@@ -119,7 +118,7 @@ def main():
     while(True):
         find_and_submit_posts()
 
-        print("Resting...")
+        print("Finished! Entering rest period...")
         time.sleep(60 * 60 * 3) #3hrs
 
 
