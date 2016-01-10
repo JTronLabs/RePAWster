@@ -100,8 +100,6 @@ def find_and_submit_posts():
     all_approved_submissions = []
     try:
         for subreddit_name in dog_subreddits:
-            if(subreddit_name == "DogsWithEyebrows"):
-                raise Exception('test exception - suck it!')
             approved_submissions = check_subreddit_for_submissions(subreddit_name, r )
 
             all_approved_submissions = all_approved_submissions + approved_submissions
