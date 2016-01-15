@@ -1,6 +1,7 @@
 import praw
 import random
 import time
+import sched
 from datetime import datetime, timedelta
 
 dog_subreddits = {"dogpictures":100,
@@ -113,15 +114,16 @@ def find_and_submit_posts():
         print(str(e))
         print("")
         print("Will retry after short rest")
-        time.sleep(60 * 5)#5min
+
+        time.sleep(60)#1 min
         find_and_submit_posts()
 
 def main():
-    while(True):
-        find_and_submit_posts()
+    #while(True):
+    find_and_submit_posts()
 
-        print("Finished! Entering rest period...")
-        time.sleep(60 * 60 * 3) #3hrs
+    print("Finished! Entering rest period...")
+    #time.sleep(60 * 60 * 3) #3hrs
 
 
 if __name__ == "__main__":
