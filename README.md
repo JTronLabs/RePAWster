@@ -16,3 +16,7 @@ Reddit bot to repost top rated pictures of dogs from various active subreddits t
 * [/r/beagle](https://www.reddit.com/r/beagle)
 * [/r/DobermanPinscher](https://www.reddit.com/r/DobermanPinscher)
 * [/r/CorgiGifs](https://www.reddit.com/r/CorgiGifs)
+
+'Top-rated' pictures are manually defined for each subreddit. Essentially I looked at the subreddits, guesstimated what the cutoff would need to be for each subreddit, and manually defined it. PRAW/Reddit have a system for checking duplicate links, so if links are caught twice they will be auto filtered without completing submission.
+
+The bot runs a on an Ubuntu virtual server with [Digital Ocean](https://www.digitalocean.com/). The script runs periodically every day using [Cron](https://en.wikipedia.org/wiki/Cron).
